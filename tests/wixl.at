@@ -1,0 +1,167 @@
+AT_BANNER([wixl])
+
+# AT_CHECK_... - add exeext automatically
+m4_define([AT_CHECK_WIXL], [
+AT_CHECK([_wixl ]$@)])
+
+# AT_WIXLDATA - copy data file from source tree
+m4_define([AT_WIXLDATA], [AT_MSIDATA([wixl/$1], [m4_default([$2], [$1])])])
+
+
+AT_SETUP([Invalid command line])
+AT_CHECK_WIXL([], [1], [ignore], [ignore])
+AT_CHECK_WIXL([out.msi foo.wxs], [1], [ignore], [ignore])
+AT_CHECK_WIXL([-o out.msi], [1], [ignore], [ignore])
+AT_CHECK_WIXL([-E], [1], [ignore], [ignore])
+AT_CHECK_WIXL([-D], [1], [ignore], [ignore])
+AT_CHECK_WIXL([-E -o out.msi], [1], [ignore], [ignore])
+AT_CHECK([test -f out.msi], [1])
+AT_CLEANUP
+
+AT_SETUP([WiX tutorial SampleFirst])
+AT_WIXLDATA([SampleFirst.wxs])
+AT_WIXLDATA([FoobarAppl10.exe])
+AT_WIXLDATA([Helper.dll])
+AT_WIXLDATA([Manual.pdf])
+AT_CHECK_WIXL([-o out.msi SampleFirst.wxs], [0], [ignore], [ignore])
+# FIXME: add tons of tests on out.msi
+AT_CHECK([test -f out.msi], [0])
+AT_CLEANUP
+
+AT_SETUP([SampleUser])
+AT_WIXLDATA([SampleUser.wxs])
+AT_WIXLDATA([FoobarAppl10.exe])
+AT_CHECK_WIXL([-o out.msi SampleUser.wxs], [0], [ignore], [ignore])
+# FIXME: add tons of tests on out.msi
+AT_CHECK([test -f out.msi], [0])
+AT_CLEANUP
+
+AT_SETUP([Stable component GUIDs])
+AT_WIXLDATA([ComponentGUID.wxs])
+AT_WIXLDATA([FoobarAppl10.exe])
+AT_WIXLDATA([Manual.pdf])
+AT_CHECK_WIXL([-o out.msi ComponentGUID.wxs], [0], [ignore], [ignore])
+# FIXME: add tons of tests on out.msi
+AT_CHECK([msiinfo export -s out.msi Component | sort | grep INSERT], [0],
+[INSERT INTO `Component` (`Component`, `ComponentId`, `Directory_`, `Attributes`, `KeyPath`) VALUES ('MainExecutable', '{E92F36A4-7332-5803-B56D-B30AED211451}', 'INSTALLDIR', 0, 'FoobarEXE')
+INSERT INTO `Component` (`Component`, `ComponentId`, `Directory_`, `Attributes`, `KeyPath`) VALUES ('Manual', '{E44FE0D4-A612-50BF-B231-0662EB694E2F}', 'INSTALLDIR', 0, 'Manual')
+INSERT INTO `Component` (`Component`, `ComponentId`, `Directory_`, `Attributes`, `KeyPath`) VALUES ('ProgramMenuDir', '{6B979E1B-8F32-5150-AA04-6D7B8BCB1614}', 'ProgramMenuDir', 4, 'reg5453B5C95074EA6F633E6D36318AFBF7')
+])
+AT_CLEANUP
+
+AT_SETUP([WiX tutorial SampleFragment])
+AT_WIXLDATA([SampleFragment.wxs])
+AT_WIXLDATA([Manual.wxs])
+AT_WIXLDATA([FoobarAppl10.exe])
+AT_WIXLDATA([Helper.dll])
+AT_WIXLDATA([Manual.pdf])
+AT_CHECK_WIXL([-o out.msi SampleFragment.wxs Manual.wxs], [0], [ignore], [ignore])
+# FIXME: add tons of tests on out.msi
+AT_CHECK([test -f out.msi], [0])
+AT_CLEANUP
+
+AT_SETUP([Preprocessor variables])
+export MY_VAR="Hello!"
+AT_DATA([variables.wxs], [<?xml version="1.0"?>
+<?define Version = "0.2.0"?>
+<?define UpgradeCode = "ABCDDCBA-8392-0202-1993-199374829923"?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Property Id="Id0" Value="$(var.UpgradeCode)"/>
+   <Property Id="Id0.1" Value="$$(var.UpgradeCode)"/>
+   <Property Id="Id0.2" Value="$$$(var.UpgradeCode)"/>
+   <?define UpgradeCode = "ABCDDCBA-8392-0202-1993-199374829924"?>
+   <Property Id="Id2" Value="$(var.UpgradeCode)"/>
+   <Property Id="Id3" Value="$(var.Version)"/>
+   <?define A = "A"?><?define B = "B"?>
+   <Property Id="IdAB" Value="$(var.A)$(var.B)"/>
+   <Property Id="IdHello" Value="$(env.MY_VAR)"/>
+   <Property Id="IdSys" Value="($(sys.SOURCEFILEDIR))foo"/>
+</Wix>
+])
+AT_CHECK_WIXL([-E variables.wxs], [0], [<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Property Id="Id0" Value="ABCDDCBA-8392-0202-1993-199374829923"/>
+  <Property Id="Id0.1" Value="$ABCDDCBA-8392-0202-1993-199374829923"/>
+  <Property Id="Id0.2" Value="$$ABCDDCBA-8392-0202-1993-199374829923"/>
+  <Property Id="Id2" Value="ABCDDCBA-8392-0202-1993-199374829924"/>
+  <Property Id="Id3" Value="0.2.0"/>
+  <Property Id="IdAB" Value="AB"/>
+  <Property Id="IdHello" Value="Hello!"/>
+  <Property Id="IdSys" Value="(variables.wxs)foo"/>
+</Wix>
+], [ignore])
+AT_DATA([variables.wxs], [<?xml version="1.0"?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <Property Id="Id$(var.Foo)" Value="$(var.Foo)"/>
+  <Property Id="Id$(var.Zig)" Value="$(var.Zig)"/>
+</Wix>
+])
+AT_CHECK_WIXL([-E variables.wxs -D Foo -D Zig=Zag], [0], [<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Property Id="Id1" Value="1"/>
+  <Property Id="IdZag" Value="Zag"/>
+</Wix>
+], [ignore])
+AT_CLEANUP
+
+AT_SETUP([Preprocessor include & condition])
+AT_WIXLDATA([IncludeTest.wxs])
+AT_WIXLDATA([IncludeWarn.wxi])
+AT_CHECK_WIXL([-o out.msi IncludeTest.wxs], [0], [ignore],
+[IncludeWarn.wxi:3: warning: IncludeWarn is included
+])
+AT_CHECK_WIXL([-D Bar -o out.msi IncludeTest.wxs], [0], [ignore],
+[IncludeTest.wxs:11: warning: Bar
+])
+AT_CHECK_WIXL([-D Foo -o out.msi IncludeTest.wxs], [0], [ignore],
+[IncludeTest.wxs:4: warning: Foo
+])
+AT_WIXLDATA([arch-condition.wxs])
+AT_CHECK_WIXL([-o out.msi arch-condition.wxs], [0], [ignore],
+[arch-condition.wxs:12: warning: no
+])
+AT_CHECK([test -f out.msi], [0])
+AT_CLEANUP
+
+AT_SETUP([System include directory])
+AT_DATA([include.wxs], [<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <?include zlib.wxi ?>
+</Wix>
+])
+
+AT_CHECK_WIXL([-E include.wxs -D SourceDir=foo -D Win64=no], [0], [stdout])
+AT_CHECK([grep -F zlib1.dll stdout], [0], [ignore])
+AT_CLEANUP
+
+AT_SETUP([ARP example])
+AT_WIXLDATA([test-arp.wxs])
+AT_WIXLDATA([FoobarAppl10.exe])
+AT_CHECK_WIXL([-o out.msi test-arp.wxs], [0], [ignore], [ignore])
+# FIXME: add tons of tests on out.msi
+AT_CHECK([test -f out.msi], [0])
+AT_CLEANUP
+
+AT_SETUP([Binary/CustomAction])
+AT_WIXLDATA([binary.wxs])
+AT_WIXLDATA([Foo.dll])
+AT_WIXLDATA([Manual.pdf])
+AT_CHECK_WIXL([-o out.msi binary.wxs], [0], [ignore], [ignore])
+# FIXME: add tons of tests on out.msi
+AT_CHECK([test -f out.msi], [0])
+AT_CLEANUP
+
+AT_BANNER([wixl-heat])
+
+AT_SETUP([Heat])
+mkdir -p test/a/b test/c
+touch test/a/file test/c/file
+find test > list
+AT_CHECK([cat list | _wixl_heat -p test/ | grep File | sort], [0],
+[          <File Id="fil1C4ED87DDF872C3D730CE70E5F0B56D2" KeyPath="yes" Source="SourceDir/a/file"/>
+          <File Id="filA95C2C271801F96CC9C5D672A7E6CC66" KeyPath="yes" Source="SourceDir/c/file"/>
+], [ignore])
+AT_CHECK([cat list | _wixl_heat -p test/ -x c | grep File | sort], [0],
+[          <File Id="fil1C4ED87DDF872C3D730CE70E5F0B56D2" KeyPath="yes" Source="SourceDir/a/file"/>
+], [ignore])
+AT_CLEANUP
