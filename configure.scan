@@ -1,30 +1,22 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.69])
+AC_PREREQ([2.70])
 AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])
-AC_CONFIG_SRCDIR([config.h.in])
+AC_CONFIG_SRCDIR([wixl.h])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
-AC_PROG_CXX
-AC_PROG_AWK
 AC_PROG_CC
-AC_PROG_CPP
-AC_PROG_INSTALL
-AC_PROG_LN_S
-AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 
 # Checks for libraries.
-# FIXME: Replace `main' with a function in `-lmsi':
+# FIXME: Replace 'main' with a function in '-lmsi':
 AC_CHECK_LIB([msi], [main])
-# FIXME: Replace `main' with a function in `-lole32':
+# FIXME: Replace 'main' with a function in '-lole32':
 AC_CHECK_LIB([ole32], [main])
 
 # Checks for header files.
-AC_FUNC_ALLOCA
-AC_CHECK_HEADERS([fcntl.h libintl.h limits.h locale.h malloc.h stddef.h stdint.h stdlib.h string.h unistd.h])
+AC_CHECK_HEADERS([fcntl.h libintl.h stdint.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
@@ -42,7 +34,7 @@ AM_GNU_GETTEXT
 AC_FUNC_MALLOC
 AC_FUNC_MKTIME
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([memmove memset mkdir rmdir strchr strdup strtol])
+AC_CHECK_FUNCS([memchr memmove memset mkdir rmdir strchr strdup strtol])
 
 AC_CONFIG_FILES([Makefile
                  data/Makefile

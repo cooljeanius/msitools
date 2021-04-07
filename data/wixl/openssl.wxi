@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?require gcc.wxi?>
+<?require zlib.wxi?>
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Fragment>
+    <DirectoryRef Id="INSTALLDIR">
+      <Directory Id="dirFB106BD26A5512624D152E1AE91311A5" Name="bin">
+        <Component Win64="$(var.Win64)" Id="cmp180069515EEF84E3D64434B53E32E2EF" Guid="*">
+          <?if $(var.Win64) = "yes"?>
+            <File Id="fil69C36901606A417E9E83EC70D1BE5216" KeyPath="yes" Source="$(var.SourceDir)/bin/libcrypto-1_1-x64.dll"/>
+          <?else?>
+            <File Id="fil69C36901606A417E9E83EC70D1BE5216" KeyPath="yes" Source="$(var.SourceDir)/bin/libcrypto-1_1.dll"/>
+          <?endif?>
+        </Component>
+        <Component Win64="$(var.Win64)" Id="cmp78BC9637069A326E7860F7EDB381EF4C" Guid="*">
+          <?if $(var.Win64) = "yes"?>
+            <File Id="fil484753D5C92047DDAB492981DE4F6F5D" KeyPath="yes" Source="$(var.SourceDir)/bin/libssl-1_1-x64.dll"/>
+          <?else?>
+            <File Id="fil484753D5C92047DDAB492981DE4F6F5D" KeyPath="yes" Source="$(var.SourceDir)/bin/libssl-1_1.dll"/>
+          <?endif?>
+        </Component>
+        <Component Win64="$(var.Win64)" Id="cmp395C7C6526C74892B8DDBA6FFD21F7A3" Guid="*">
+          <File Id="filC2F467A974504B50AEABE12358B930E7" KeyPath="yes" Source="$(var.SourceDir)/bin/make-dummy-cert"/>
+        </Component>
+        <Component Win64="$(var.Win64)" Id="cmp7CAB2ADC32B44CD4B4DB6AF40C4E601C" Guid="*">
+          <File Id="fil64A9A7E5238B40809519518423F98A04" KeyPath="yes" Source="$(var.SourceDir)/bin/c_rehash"/>
+        </Component>
+      </Directory>
+      <Directory Id="dir4E367092058C305C8D4A39EA27BB2FE9" Name="etc">
+        <Directory Id="dir58408AA18D9E069B042C860A8E428F9C" Name="pki">
+          <Directory Id="dir510DB609C3F001786541D1DE8E996B70" Name="CA">
+          </Directory>
+          <Directory Id="dir5C44C4BF436F189C06A91A4660678A24" Name="tls">
+            <Directory Id="dirD45DE9E9CAB4BE5E63AD4D04F6806229" Name="certs">
+              <Component Win64="$(var.Win64)" Id="cmpF4AC5E1C8B8F52A9E82B6D444415195E" Guid="*">
+                <File Id="fil92C36E70F9FD6288DBB69D80F59DCFD3" KeyPath="yes" Source="$(var.SourceDir)/etc/pki/tls/certs/Makefile"/>
+              </Component>
+            </Directory>
+            <Directory Id="dir41A7BA1ECA217B267001D6C667CDA303" Name="misc">
+              <Component Win64="$(var.Win64)" Id="cmpF3B98883A02530C5B7BE078B77A99EDD" Guid="*">
+                <File Id="fil3371D8AAA32C7E5720A6BFDB1FA157D3" KeyPath="yes" Source="$(var.SourceDir)/etc/pki/tls/misc/CA.pl"/>
+              </Component>
+              <Component Win64="$(var.Win64)" Id="cmp227F1DE4BB99FCD6BCF1AE825C00875B" Guid="*">
+                <File Id="fil9FDCC7B3E5AD0709F2E5CBA6544A552F" KeyPath="yes" Source="$(var.SourceDir)/etc/pki/tls/misc/tsget"/>
+              </Component>
+            </Directory>
+            <Component Win64="$(var.Win64)" Id="cmp2E54F8C4A1D93038E7927F172A186E21" Guid="*">
+              <File Id="filAFADD415BCA270CA348E8FA906B3CD04" KeyPath="yes" Source="$(var.SourceDir)/etc/pki/tls/openssl.cnf"/>
+            </Component>
+            <Directory Id="dirCD184D71C8F8D24F893B9EAC344B61A8" Name="private">
+              </Directory>
+            </Directory>
+          </Directory>
+        </Directory>
+    </DirectoryRef>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="CG.openssl">
+      <ComponentGroupRef Id="CG.gcc"/>
+      <ComponentGroupRef Id="CG.zlib"/>
+      <ComponentRef Id="cmp180069515EEF84E3D64434B53E32E2EF"/>
+      <ComponentRef Id="cmp78BC9637069A326E7860F7EDB381EF4C"/>
+      <ComponentRef Id="cmpF4AC5E1C8B8F52A9E82B6D444415195E"/>
+      <ComponentRef Id="cmpF3B98883A02530C5B7BE078B77A99EDD"/>
+      <ComponentRef Id="cmp395C7C6526C74892B8DDBA6FFD21F7A3"/>
+      <ComponentRef Id="cmp7CAB2ADC32B44CD4B4DB6AF40C4E601C"/>
+      <ComponentRef Id="cmp227F1DE4BB99FCD6BCF1AE825C00875B"/>
+      <ComponentRef Id="cmp2E54F8C4A1D93038E7927F172A186E21"/>
+    </ComponentGroup>
+  </Fragment>
+</Include>

@@ -1,7 +1,7 @@
 NULL =
 CLEANFILES =
 EXTRA_DIST =
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I m4 --install
 SUBDIRS = include data libmsi tests po .
 
 makeflags_ = $(makeflags_$(AM_DEFAULT_VERBOSITY))

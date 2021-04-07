@@ -61,12 +61,12 @@ po/cat-id-tbl.tmp
 po/msitools.pot
 stamp-h*
 tests/Makefile
-tests/package.m4*
+tests/package.m4.tmp
+tests/package.m4
 tests/testdatabase
 tests/testrecord
 tests/testsuite
 tests/testsuite.dir
 tools/msidiff
 tools/msidump
-wixl
 wixl-heat
