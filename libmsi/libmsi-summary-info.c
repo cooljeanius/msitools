@@ -392,7 +392,7 @@ static void read_properties_from_data( LibmsiOLEVariant *prop, const uint8_t *da
             if( type == OLEVT_I2 || type == OLEVT_I4) {
                 property->intval = atoi( str );
             } else if( type == OLEVT_FILETIME) {
-                parse_filetime( str, &property->filetime );
+                parse_filetime(str, (guint64 *)&property->filetime);
             }
             msi_free (str);
         }
@@ -517,7 +517,7 @@ static unsigned write_property_to_data( const LibmsiOLEVariant *prop, uint8_t *d
         sz += write_dword( data, sz, prop->intval );
         break;
     case OLEVT_FILETIME: {
-        sz += write_filetime( data, sz, &prop->filetime );
+        sz += write_filetime(data, sz, (const guint64 *)&prop->filetime);
         break;
     }
     case OLEVT_LPSTR:

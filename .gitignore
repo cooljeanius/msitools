@@ -59,6 +59,7 @@ po/Makefile.in
 po/POTFILES
 po/cat-id-tbl.tmp
 po/msitools.pot
+po/stamp-it
 stamp-h*
 tests/Makefile
 tests/package.m4.tmp

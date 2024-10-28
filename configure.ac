@@ -4,8 +4,8 @@ dnl# Process this file with autoconf to produce a configure script.
 AC_INIT([msitools],[0.93],[https://bugzilla.gnome.org/enter_bug.cgi?product=msitools])
 AC_PREREQ([2.69])
 if test "x${VERSION}" = "x"; then
-	test -z "${VERSION}" && export VERSION="`build-aux/git-version-gen .tarball-version`"
-	AC_SUBST([VERSION])
+  test -z "${VERSION}" && export VERSION="`build-aux/git-version-gen .tarball-version`"
+  AC_SUBST([VERSION])
 fi
 
 AC_CONFIG_HEADERS([config.h])
@@ -21,7 +21,7 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 AM_MISSING_PROG([AUTOM4TE],[autom4te])dnl
 
 # Automake
-AM_INIT_AUTOMAKE([dejagnu foreign subdir-objects -Wno-portability dist-xz])
+AM_INIT_AUTOMAKE([dejagnu foreign subdir-objects -Wno-obsolete -Wno-portability dist-xz])
 AM_MAINTAINER_MODE
 AM_PROG_INSTALL_STRIP
 
@@ -33,11 +33,11 @@ AC_USE_SYSTEM_EXTENSIONS
 # Checks for programs.
 AM_PROG_AR
 if test "x${CC}" = "x"; then
-	test -z "${CC}"
-	AC_PROG_CC
+  test -z "${CC}" || unset CC
+  AC_PROG_CC
 else
-	test ! -z "${CC}" && export CC
-	AC_SUBST([CC])
+  test -n "${CC}" && export CC
+  AC_SUBST([CC])
 fi
 AC_PROG_CPP
 AC_PROG_CXX
@@ -80,11 +80,11 @@ LT_INIT([win32-dll static disable-fast-install])
 LT_LANG([C])
 LT_LANG([Windows Resource])
 if test "x${RANLIB}" = "x"; then
-	test -z "${RANLIB}"
-	AC_PROG_RANLIB
+  test -z "${RANLIB}" || unset RANLIB
+  AC_PROG_RANLIB
 else
-	test ! -z "${RANLIB}" && export RANLIB
-	AC_SUBST([RANLIB])
+  test -n "${RANLIB}" && export RANLIB
+  AC_SUBST([RANLIB])
 fi
 
 # Gnome stuff
@@ -97,10 +97,11 @@ AC_SUBST([VAPIGEN])
 AM_CONDITIONAL([VAPI],[test "x${VAPIGEN}" != "xno"])dnl
 
 # Existing(?) Wixl
-PKG_CHECK_MODULES([WIXL],[gio-2.0 >= 0.23.0
-                          libgcab-1.0 >= 0.1.10
-                          uuid >= 1.4.1
-                          libxml-2.0 >= 2.7])dnl
+PKG_CHECK_MODULES([WIXL],
+                  [gio-2.0 >= 0.23.0
+                   libgcab-1.0 >= 0.1.10
+                   uuid >= 1.4.1
+                   libxml-2.0 >= 2.7])dnl
 
 # Gettext
 GETTEXT_PACKAGE=msitools
@@ -122,10 +123,13 @@ nw="${nw} -Wsign-conversion"           # Likewise.
 nw="${nw} -Wunused-parameter"          # Likewise.
 nw="${nw} -Wunused-local-typedefs"     # Likewise.
 nw="${nw} -Wunused-macros"             # Likewise.
+nw="${nw} -Wunused"               # Umbrella flag containing those prefixed with it
 nw="${nw} -Wunsafe-loop-optimizations" # Likewise.
 nw="${nw} -Wabi"                       # Valid for C++/ObjC++ but not for C
 nw="${nw} -Wdeprecated"                # Likewise.
 nw="${nw} -Wuninitialized"            # Not supported if optimization is turned off
+nw="${nw} -Wmudflap"                   # No longer supported.
+nw="${nw} -Wmissing-field-initializers" # Explicitly disabled later.
 # Enable all GCC warnings not in this list.
 gl_MANYWARN_COMPLEMENT([warnings],[${warnings}],[${nw}])
 for w in ${warnings}; do
@@ -136,16 +140,16 @@ gl_WARN_ADD([-Wno-unused-parameter])
 gl_WARN_ADD([-Wno-missing-field-initializers])dnl
 
 # Checks for header files.
-AC_HEADER_STDBOOL dnl# calls AC_CHECK_HEADER_STDBOOL
+AC_HEADER_STDBOOL dnl# also "_CHECK"s it
 AC_CHECK_HEADERS([fcntl.h libintl.h libkern/i386/_OSByteOrder.h libmsi.h limits.h \
-                  malloc.h malloc/malloc.h stddef.h stdio.h windows.h])dnl
+                  malloc.h malloc/malloc.h stddef.h stdio_ext.h windows.h])dnl
 
 if test "x${ac_cv_header_stdint_h}" = "x"; then
-  test -z "${ac_cv_header_stdint_h}"
+  test -z "${ac_cv_header_stdint_h}" || unset ac_cv_header_stdint_h
   AC_CHECK_HEADERS([stdint.h])
 fi
 if test "x${ac_cv_header_unistd_h}" = "x"; then
-  test -z "${ac_cv_header_unistd_h}"
+  test -z "${ac_cv_header_unistd_h}" || unset ac_cv_header_unistd_h
   AC_CHECK_HEADERS([unistd.h])
 fi
 

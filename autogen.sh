@@ -5,7 +5,7 @@ test -n "$srcdir" || srcdir=.
 (
   cd "$srcdir" &&
   mkdir -p m4 &&
-  AUTOPOINT='intltoolize --automake --copy' autoreconf -fiv -Wall
+  AUTOPOINT='intltoolize --automake --copy' autoreconf -fiv -Wall -Wno-obsolete
 ) || exit
 test -n "$NOCONFIGURE" || echo "Running ./configure $@ (because NOCONFIGURE is _not_ set)" && "$srcdir/configure" "$@"
 
