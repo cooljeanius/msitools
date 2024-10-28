@@ -9,6 +9,7 @@ build-aux/install-sh linguist-vendored
 build-aux/ltmain.sh linguist-vendored
 build-aux/missing linguist-vendored
 build-aux/ylwrap linguist-vendored
+configure.scan linguist-generated
 m4/g*.m4 linguist-vendored
 m4/i*.m4 linguist-vendored
 m4/l*.m4 linguist-vendored

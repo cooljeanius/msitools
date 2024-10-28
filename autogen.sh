@@ -10,4 +10,4 @@ test -n "$srcdir" || srcdir=.
 test -n "$NOCONFIGURE" || echo "Running ./configure $@ (because NOCONFIGURE is _not_ set)" && "$srcdir/configure" "$@"
 
 test -e config.h.in~ && rm -f config.h.in~
-test -e autom4te.cache && rm -rf autom4te.cache
+test -e autom4te.cache && (rm -rf autom4te.cache || rmdir autom4te.cache)

@@ -159,7 +159,7 @@ EXTRA_DIST += $(completion_DATA)
 # Autotest support
 
 dist_noinst_DATA = tests/testsuite.at tests/wixl.at tests/package.m4 tests/testsuite
-DISTCLEANFILES = atconfig atlocal
+DISTCLEANFILES = atconfig atlocal *~ autoscan.log build-aux/*~ po/*~
 CLEANFILES += testsuite.log
 
 check-local: $(srcdir)/tests/testsuite atconfig atlocal
